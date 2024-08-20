@@ -89,13 +89,14 @@ WHERE
 GROUP BY 
   subtipo
 
+
 -- 7. Selecione os chamados com esse subtipo que foram abertos durante os eventos contidos na tabela de eventos (Reveillon, Carnaval e Rock in Rio).
 -- R: Query.
 SELECT 
-  evento,
+  evento
 FROM 
   `datario.adm_central_atendimento_1746.chamado`
-LEFT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
+RIGHT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
   ON DATE(`datario.adm_central_atendimento_1746.chamado`.data_inicio) 
     BETWEEN 
       DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_inicial) AND DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_final)
@@ -109,7 +110,7 @@ SELECT
   COUNT(*) as chamados_por_evento
 FROM 
   `datario.adm_central_atendimento_1746.chamado`
-LEFT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
+RIGHT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
   ON DATE(`datario.adm_central_atendimento_1746.chamado`.data_inicio) 
     BETWEEN 
       DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_inicial) AND DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_final)
@@ -120,14 +121,14 @@ GROUP BY
 
 -- 9. Qual evento teve a maior média diária de chamados abertos desse subtipo?
 -- R: Rock in Rio juntando os dois períodos com 119 chamados abertos por dia de evento. Criei uma CTE e utilizei a média da contagem por dia de evento.
-WITH diarias AS (
+WITH diarias AS ( -- CTE faz a contagem de chamados por dia de evento
   SELECT
     evento,
     DATE(data_inicio) AS data_chamado,
     COUNT(*) AS chamados_diarios
   FROM
     `datario.adm_central_atendimento_1746.chamado`
-  LEFT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
+  RIGHT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
     ON DATE(`datario.adm_central_atendimento_1746.chamado`.data_inicio) BETWEEN DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_inicial) AND DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_final)
   WHERE
     subtipo = 'Perturbação do sossego'
@@ -135,7 +136,7 @@ WITH diarias AS (
     evento,
     DATE(data_inicio)
 )
-SELECT
+SELECT -- Query calculando a média de chamado por dia de cada evento
   evento,
   AVG(chamados_diarios) AS media_chamados_por_evento
 FROM
@@ -145,7 +146,7 @@ GROUP BY
 
 -- 10. Compare as médias diárias de chamados abertos desse subtipo durante os eventos específicos (Reveillon, Carnaval e Rock in Rio) e a média diária de chamados abertos desse subtipo considerando todo o período de 01/01/2022 até 31/12/2023.
 -- R: Fiz CTE's com as queries das questões anteriores e utilize um CROSS JOIN para comparar os períodos, como consta abaixo:
-WITH diarias AS (
+WITH diarias AS ( -- CTE faz a contagem dos chamados por dia durante os períodos dos eventos
   SELECT
     evento,
     DATE(data_inicio) AS data_chamado,
@@ -160,7 +161,7 @@ WITH diarias AS (
     evento,
     DATE(data_inicio)
 ),
-media_chamados_por_evento AS (
+media_chamados_por_evento AS ( -- CTE calcula média por evento
 SELECT
   evento,
   AVG(chamados_diarios) AS media_chamados_por_evento
@@ -169,7 +170,7 @@ FROM
 GROUP BY
   evento
 ),
-chamados_diarios_ano AS (
+chamados_diarios_ano AS ( -- CTE faz a contagem dos chamados abertos durante o periodo do ano mencionado na questão
   SELECT
     DATE(data_inicio) AS data_chamada,
     COUNT(*) AS chamados_diarios
@@ -181,13 +182,13 @@ chamados_diarios_ano AS (
   GROUP BY
     DATE(data_inicio)
 ),
-media_chamados_ano AS (
+media_chamados_ano AS ( -- CTE calcula a média de chamados por dia no ano supramencionado
 SELECT
   AVG(chamados_diarios) AS media_diaria_chamados
 FROM
   chamados_diarios_ano
 )
-SELECT
+SELECT -- Query de seleção dos dados
   m.evento,
   m.media_chamados_por_evento,
   d.media_diaria_chamados
