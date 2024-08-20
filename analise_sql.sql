@@ -88,3 +88,19 @@ WHERE
   DATE(data_inicio) BETWEEN '2022-01-01' AND '2023-12-31' AND subtipo = 'Perturbação do sossego'
 GROUP BY 
   subtipo
+
+-- 7. Selecione os chamados com esse subtipo que foram abertos durante os eventos contidos na tabela de eventos (Reveillon, Carnaval e Rock in Rio).
+-- R:  834 chamados durante o Rock in Rio, 241 chamados durante o Carnaval e 139 chamados durante o Reveillon.
+SELECT 
+  evento,
+  COUNT(*) as chamados_por_evento
+FROM 
+  `datario.adm_central_atendimento_1746.chamado`
+LEFT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
+  ON DATE(`datario.adm_central_atendimento_1746.chamado`.data_inicio) 
+    BETWEEN 
+      DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_inicial) AND DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_final)
+WHERE 
+  subtipo = 'Perturbação do sossego'
+GROUP BY 
+  evento
