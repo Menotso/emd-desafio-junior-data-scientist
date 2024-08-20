@@ -21,14 +21,14 @@ ORDER BY
     chamadas_por_tipo DESC
 
 -- 3. Quais os nomes dos 3 bairros que mais tiveram chamados abertos nesse dia?
--- R: Campo Grande, Tijuca e Barra da Tijuca. Importante salientar que há 73 chamados não associados a um bairro, por isso o bairro 128 foi incluído no top 3.
+-- R: Campo Grande, Tijuca e Barra da Tijuca.
 SELECT 
   `datario.adm_central_atendimento_1746.chamado`.id_bairro,
   `datario.dados_mestres.bairro`.nome as nome_bairro,
   COUNT(*) AS qtd_chamado 
 FROM 
   `datario.adm_central_atendimento_1746.chamado`
-LEFT JOIN 
+RIGHT JOIN 
   `datario.dados_mestres.bairro`
   ON `datario.adm_central_atendimento_1746.chamado`.id_bairro = `datario.dados_mestres.bairro`.id_bairro
 WHERE
@@ -45,7 +45,7 @@ SELECT
   COUNT(*) AS qtd_chamado 
 FROM 
   `datario.adm_central_atendimento_1746.chamado`
-LEFT JOIN 
+RIGHT JOIN 
   `datario.dados_mestres.bairro`
   ON `datario.adm_central_atendimento_1746.chamado`.id_bairro = `datario.dados_mestres.bairro`.id_bairro
 WHERE
@@ -153,7 +153,7 @@ WITH diarias AS ( -- CTE faz a contagem dos chamados por dia durante os período
     COUNT(*) AS chamados_diarios
   FROM
     `datario.adm_central_atendimento_1746.chamado`
-  LEFT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
+  RIGHT JOIN `datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`
     ON DATE(`datario.adm_central_atendimento_1746.chamado`.data_inicio) BETWEEN DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_inicial) AND DATE(`datario.turismo_fluxo_visitantes.rede_hoteleira_ocupacao_eventos`.data_final)
   WHERE
     subtipo = 'Perturbação do sossego'
