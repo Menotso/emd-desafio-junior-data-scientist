@@ -77,3 +77,14 @@ GROUP BY
   nome_bairro, subprefeitura
 ORDER BY
   qtd_chamado DESC
+
+-- 6. Quantos chamados com o subtipo "Perturbação do sossego" foram abertos desde 01/01/2022 até 31/12/2023 (incluindo extremidades)?
+-- R: 42.830 chamados abertos nas datas acima mencionadas, incluindo extremidades.
+SELECT 
+  subtipo, COUNT(*) as chamados_por_subtipo
+FROM 
+  `datario.adm_central_atendimento_1746.chamado`
+WHERE 
+  DATE(data_inicio) BETWEEN '2022-01-01' AND '2023-12-31' AND subtipo = 'Perturbação do sossego'
+GROUP BY 
+  subtipo
